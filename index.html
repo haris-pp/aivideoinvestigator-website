@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Video Investigator: search your camera footage in plain English</title>
+<meta name="description" content="AI Video Investigator records IP cameras, detects people and vehicles, and finds any moment when you type what you're looking for. Live view, a 24-hour timeline and instant clips. Runs entirely on one PC, with no cloud.">
+<meta name="theme-color" content="#0a0a0c">
+
+<!-- Social previews need an absolute address: this is where the site is published. -->
+<link rel="canonical" href="https://haris-pp.github.io/aivideoinvestigator-website/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://haris-pp.github.io/aivideoinvestigator-website/">
+<meta property="og:title" content="AI Video Investigator: search your camera footage in plain English">
+<meta property="og:description" content="Type “white car at Staff Parking” or “people playing basketball” and jump to the moment. Live view, AI detection, a 24-hour timeline and instant clips, all on one PC.">
+<meta property="og:image" content="https://haris-pp.github.io/aivideoinvestigator-website/assets/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Crect width='30' height='30' rx='8' fill='%236d8cff'/%3E%3Ccircle cx='15' cy='15' r='6.5' fill='none' stroke='%23fff' stroke-width='2.4'/%3E%3Ccircle cx='15' cy='15' r='2.6' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preload" href="assets/fonts/manrope-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+<script>document.documentElement.classList.add('js')</script>
+
+<style>
+/* Fonts are served from this site (assets/fonts): the page makes no request to any other server. */
+@font-face{font-family:"Manrope";src:url("assets/fonts/manrope-latin-wght.woff2") format("woff2");font-weight:200 800;font-style:normal;font-display:swap}
+@font-face{font-family:"DM Mono";src:url("assets/fonts/dm-mono-latin-400.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"DM Mono";src:url("assets/fonts/dm-mono-latin-500.woff2") format("woff2");font-weight:500;font-style:normal;font-display:swap}
+
+/* Same palette as the application's dashboard */
+:root{
+  --bg:#0a0a0c; --surface:#131318; --surface-2:#1a1a20; --line:#26262d; --line-2:#33333c;
+  --ink:#ececf1; --muted:#9a9aa6; --dim:#6b6b77;
+  --accent:#6d8cff; --accent-ink:#fff; --accent-soft:rgba(109,140,255,.14);
+  --person:#5ec8ff; --vehicle:#ffb547; --motion:#a78bfa; --ok:#3ddc84; --rec:#ff4d5e;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 18px 50px rgba(0,0,0,.45);
+  --font:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"DM Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  --gutter:clamp(16px,4vw,32px); --max:1180px;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:light){
+  :root{
+    --bg:#f4f5f8; --surface:#fff; --surface-2:#f7f8fb; --line:#e3e6ee; --line-2:#d4d8e2;
+    --ink:#11131a; --muted:#5a6072; --dim:#8a90a0;
+    --accent:#3f5fe0; --accent-soft:rgba(63,95,224,.1);
+    --person:#0284c7; --vehicle:#b45309; --motion:#7c3aed;
+    --shadow:0 1px 2px rgba(17,19,26,.05),0 14px 40px rgba(17,19,26,.08);
+    color-scheme:light;
+  }
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1.0625rem/1.65 var(--font);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img,video{display:block;max-width:100%;height:auto}
+a{color:var(--accent);text-underline-offset:.18em}
+h1,h2,h3{line-height:1.15;letter-spacing:-.02em;margin:0;text-wrap:balance}
+p{margin:0}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--gutter)}
+.skip{position:absolute;left:-9999px}.skip:focus{left:16px;top:16px;z-index:99;background:var(--surface);padding:8px 14px;border-radius:8px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+code,kbd{font-family:var(--mono);font-size:.88em}
+code,kbd,.q,.eyebrow,.chip,.kicker,.step small,.step code,.screen__bar span{font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0}
+.feature p code{color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1px 6px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:20px;height:64px;max-width:none;
+  background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid var(--line)}
+.top>*{flex:none}
+.brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:700;letter-spacing:-.01em}
+.top__links{display:flex;gap:22px;margin-left:auto}
+.top__links a{color:var(--muted);text-decoration:none;font-size:.95rem;font-weight:500}
+.top__links a:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:10px;padding:12px 20px;font-weight:600;font-size:1rem;text-decoration:none;border:1px solid transparent;transition:background .15s,border-color .15s,transform .15s;cursor:pointer}
+.btn:active{transform:translateY(1px)}
+.btn--solid{background:var(--accent);color:var(--accent-ink)}
+.btn--solid:hover{background:color-mix(in srgb,var(--accent) 88%,#fff)}
+.btn--line{border-color:var(--line-2);color:var(--ink);background:var(--surface)}
+.btn--line:hover{border-color:var(--dim)}
+.btn--small{padding:8px 14px;font-size:.92rem}
+
+/* hero */
+.hero{padding:clamp(48px,8vw,96px) var(--gutter) 40px;text-align:center}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font:500 .82rem/1 var(--mono);color:var(--muted);border:1px solid var(--line-2);border-radius:30px;padding:7px 14px;background:var(--surface)}
+.eyebrow i{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
+.hero h1{font-size:clamp(2.4rem,6vw,4.4rem);font-weight:800;margin:22px auto 0;max-width:15ch}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero__lead{max-width:62ch;margin:20px auto 0;color:var(--muted);font-size:clamp(1.05rem,1.6vw,1.22rem)}
+.hero__cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+.hero__note{margin-top:16px;font-size:.9rem;color:var(--dim)}
+.queries{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:34px auto 0;max-width:920px}
+.q{display:inline-flex;align-items:center;gap:8px;font:500 .9rem/1.2 var(--mono);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 14px}
+.q svg{flex:none;color:var(--accent)}
+
+.screen{margin:44px auto 0;max-width:1180px;border-radius:14px;overflow:hidden;border:1px solid var(--line-2);background:#000;box-shadow:var(--shadow);position:relative}
+.screen video{width:100%;aspect-ratio:16/9;object-fit:cover}
+.screen__bar{display:flex;align-items:center;gap:6px;padding:9px 12px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+.screen__bar i{width:10px;height:10px;border-radius:50%;background:var(--line-2)}
+.screen__bar span{margin-left:10px;font:500 .78rem var(--mono);color:var(--dim)}
+.caption{margin-top:12px;font-size:.84rem;color:var(--dim);text-align:center}
+
+/* sections */
+.sec{padding:clamp(64px,9vw,112px) 0;border-top:1px solid var(--line)}
+.sec--tint{background:var(--surface-2)}
+.sec__head{max-width:720px;margin-bottom:44px}
+.sec__head .kicker{font:500 .8rem var(--mono);color:var(--accent);letter-spacing:.06em;text-transform:uppercase}
+.sec__head h2{font-size:clamp(1.9rem,3.6vw,2.7rem);font-weight:800;margin-top:10px}
+.sec__head p{margin-top:14px;color:var(--muted);font-size:1.1rem}
+
+/* pillars */
+.pillars{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:56px;text-align:left}
+.pillar{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.pillar img{aspect-ratio:16/10;object-fit:cover;object-position:top left;border-bottom:1px solid var(--line)}
+.pillar div{padding:16px 18px 20px}
+.pillar b{display:block;font-size:1.05rem}
+.pillar p{color:var(--muted);font-size:.94rem;margin-top:6px}
+
+/* feature rows */
+.feature{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(24px,5vw,64px);align-items:center;margin-top:72px}
+.feature:first-of-type{margin-top:0}
+.feature--flip .feature__text{order:2}
+.feature h3{font-size:clamp(1.4rem,2.4vw,1.8rem);font-weight:800}
+.feature p{color:var(--muted);margin-top:12px}
+.feature ul{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:10px}
+.feature li{position:relative;padding-left:26px;font-size:.98rem}
+.feature li::before{content:"";position:absolute;left:2px;top:.55em;width:12px;height:7px;border-left:2px solid var(--accent);border-bottom:2px solid var(--accent);transform:rotate(-45deg)}
+.shot{display:block;border-radius:12px;overflow:hidden;border:1px solid var(--line-2);box-shadow:var(--shadow);background:#000}
+.shot:hover{border-color:var(--dim)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.chip{font:500 .8rem var(--mono);border-radius:20px;padding:4px 10px;border:1px solid var(--line-2);background:var(--surface)}
+.chip--p{color:var(--person)}.chip--v{color:var(--vehicle)}.chip--m{color:var(--motion)}.chip--a{color:var(--accent)}
+
+/* how it works */
+.flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;align-items:stretch}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;position:relative}
+.step:not(:last-child)::after{content:"";position:absolute;right:-12px;top:50%;width:12px;height:2px;background:var(--line-2)}
+.step small{font:500 .74rem var(--mono);color:var(--accent);letter-spacing:.05em}
+.step b{display:block;margin-top:6px;font-size:1.02rem}
+.step p{color:var(--muted);font-size:.9rem;margin-top:6px}
+.step code{display:inline-block;margin-top:10px;color:var(--dim)}
+.notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:28px}
+.note{border-left:2px solid var(--accent);padding:2px 0 2px 16px}
+.note b{display:block}
+.note p{color:var(--muted);font-size:.94rem;margin-top:4px}
+
+/* stack */
+.stack{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.tech{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
+.tech b{display:block;font-size:1rem}
+.tech span{display:block;color:var(--muted);font-size:.88rem;margin-top:4px}
+
+/* numbers */
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px}
+.stat b{display:block;font-size:clamp(1.8rem,3.4vw,2.4rem);font-weight:800;letter-spacing:-.02em;color:var(--accent)}
+.stat span{display:block;margin-top:6px;font-weight:600}
+.stat p{color:var(--muted);font-size:.9rem;margin-top:6px}
+
+/* demo + status + contact */
+.demo{border-radius:14px;overflow:hidden;border:1px solid var(--line-2);box-shadow:var(--shadow);background:#000}
+.demo video{width:100%;aspect-ratio:16/9}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px}
+.card h3{font-size:1.15rem}
+.card ul{margin:12px 0 0;padding-left:20px;color:var(--muted)}
+.card li{margin-top:6px}
+.contact{text-align:center}
+.contact h2{font-size:clamp(1.9rem,3.6vw,2.7rem);font-weight:800}
+.contact p{color:var(--muted);max-width:60ch;margin:14px auto 0}
+.contact .hero__cta{margin-top:26px}
+footer{border-top:1px solid var(--line);padding:32px 0 48px;color:var(--dim);font-size:.86rem}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between}
+footer a{color:var(--muted)}
+footer p{max-width:70ch}
+
+/* reveal on scroll (only when JS runs) */
+.js .rv{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+.js .rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.js .rv{opacity:1;transform:none;transition:none}}
+
+@media (max-width:1000px){
+  .pillars{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .flow{grid-template-columns:1fr}
+  .step:not(:last-child)::after{left:50%;right:auto;top:auto;bottom:-12px;width:2px;height:12px}
+  .stack{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .notes,.stats{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .top__links{display:none}
+  .top .btn{margin-left:auto}
+  .feature{grid-template-columns:1fr}
+  .feature--flip .feature__text{order:0}
+  .cols{grid-template-columns:1fr}
+  .pillars{grid-template-columns:1fr}
+}
+@media (max-width:420px){.top .btn{display:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#features">Skip to content</a>
+
+<header class="wrap top">
+  <a class="brand" href="#top" aria-label="AI Video Investigator, back to the top">
+    <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><rect width="30" height="30" rx="8" fill="var(--accent)"/><circle cx="15" cy="15" r="6.5" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="15" cy="15" r="2.6" fill="#fff"/></svg>
+    AI Video Investigator
+  </a>
+  <nav class="top__links" aria-label="Page sections">
+    <a href="#features">Features</a>
+    <a href="#demo">Demo</a>
+    <a href="#how">How it works</a>
+    <a href="#stack">Built with</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <a class="btn btn--solid btn--small" href="#demo">Watch the demo</a>
+</header>
+
+<main id="top">
+
+<!-- ======================= hero ======================= -->
+<section class="hero" aria-labelledby="h-hero">
+  <span class="eyebrow"><i></i>Runs entirely on one PC · no cloud</span>
+  <h1 id="h-hero">Ask your cameras <em>what happened.</em></h1>
+  <p class="hero__lead">AI Video Investigator records your IP cameras, detects every person and vehicle, and finds any moment when you type what you're looking for. Watch live, scrub a 24-hour timeline and cut the clip in a second.</p>
+  <div class="hero__cta">
+    <a class="btn btn--solid" href="#demo">Watch the 1-minute demo</a>
+    <a class="btn btn--line" href="#contact">Get in touch</a>
+  </div>
+  <p class="hero__note">Built in C++ and Qt 6 by Haris P P. Source available on request.</p>
+
+  <div class="queries" aria-label="Example searches">
+    <span class="q"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>white car at Staff Parking</span>
+    <span class="q"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>people at the Bus Waiting Room in the last hour</span>
+    <span class="q"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>people playing basketball</span>
+  </div>
+
+  <figure class="screen rv" style="margin-left:auto;margin-right:auto">
+    <div class="screen__bar" aria-hidden="true"><i></i><i></i><i></i><span>127.0.0.1 · AI Video Investigator</span></div>
+    <video autoplay muted loop playsinline preload="metadata" poster="assets/video/poster.jpg" aria-label="One-minute product demo, without sound">
+      <source src="assets/video/demo-60s.mp4" type="video/mp4">
+    </video>
+  </figure>
+  <p class="caption">One-minute tour, recorded from the running app. No sound.</p>
+
+  <div class="pillars wrap" style="padding:0" role="list" aria-label="Main features">
+    <article class="pillar rv" role="listitem"><img src="screenshots/live.jpg" width="1920" height="1080" loading="lazy" alt=""><div><b>Live camera wall</b><p>1 to 16 cameras over WebRTC. Show or hide any camera; double-click for full size.</p></div></article>
+    <article class="pillar rv" role="listitem"><img src="screenshots/search-crop.jpg" width="1300" height="650" loading="lazy" alt=""><div><b>Search in plain English</b><p>Objects, colours, cameras and times, understood instantly and offline.</p></div></article>
+    <article class="pillar rv" role="listitem"><img src="screenshots/visual-crop.jpg" width="1300" height="650" loading="lazy" alt=""><div><b>Visual search</b><p>Describe how it looks. An image-text model ranks every detection.</p></div></article>
+    <article class="pillar rv" role="listitem"><img src="screenshots/playback-crop.jpg" width="1300" height="950" loading="lazy" alt=""><div><b>Timeline and clips</b><p>People, vehicles and motion on 24 hours. Drag to cut a clip.</p></div></article>
+  </div>
+</section>
+
+<!-- ======================= features ======================= -->
+<section class="sec" id="features" aria-labelledby="h-features">
+  <div class="wrap">
+    <div class="sec__head">
+      <span class="kicker">Features</span>
+      <h2 id="h-features">From the camera to the exact moment</h2>
+      <p>Hours of footage become a list of people and vehicles you can search, play and export, without sending a single frame to the internet.</p>
+    </div>
+
+    <article class="feature rv">
+      <div class="feature__text">
+        <h3>A live wall that stays smooth</h3>
+        <p>Every camera plays straight from its own stream in the browser. Pick a layout, hide the cameras you don't need, and open any one full size.</p>
+        <ul>
+          <li>Layouts with 1, 4, 6, 8, 9 or 16 cameras, grouped by site</li>
+          <li>Hidden cameras aren't streamed at all, which saves CPU</li>
+          <li>Recording continues for every camera as 5-minute MP4 files, copied as the camera sends them</li>
+        </ul>
+      </div>
+      <a class="shot" href="screenshots/live.jpg"><img src="screenshots/live.jpg" width="1920" height="1080" loading="lazy" alt="Live view: a nine-camera wall of a school and a bus station, a camera list grouped by site, and today's events on the right"></a>
+    </article>
+
+    <article class="feature feature--flip rv">
+      <div class="feature__text">
+        <h3>Every person and vehicle, once</h3>
+        <p>Each recording is analysed with YOLOv8. Objects are tracked from frame to frame, so a parked car is one event, not one per second, and each event keeps its best picture and its colour.</p>
+        <div class="chips"><span class="chip chip--p">person</span><span class="chip chip--v">car · truck · bus</span><span class="chip">colour</span><span class="chip chip--m">motion level per second</span></div>
+      </div>
+      <a class="shot" href="screenshots/focus.jpg"><img src="screenshots/focus.jpg" width="1920" height="1080" loading="lazy" alt="One camera opened full size, with the detections from that camera listed on the right"></a>
+    </article>
+
+    <article class="feature rv">
+      <div class="feature__text">
+        <h3>Search the way you'd ask a colleague</h3>
+        <p>Type <code>white car at Staff Parking</code> or <code>people at the Bus Waiting Room in the last hour</code>. The search understands objects, colours, camera names, dates and times, shows what it understood as filters you can remove, and suggests close matches when nothing fits exactly.</p>
+        <ul>
+          <li>Autocomplete for camera names and common phrases</li>
+          <li>Handles typos, "not red", "between 4 and 7", "yesterday afternoon"</li>
+          <li>Optional local language model (llama.cpp) for unusual words, and it can never make a search worse</li>
+        </ul>
+      </div>
+      <a class="shot" href="screenshots/search.jpg"><img src="screenshots/search-crop.jpg" width="1300" height="650" loading="lazy" alt="Search results for white car at Staff Parking: filter chips for car, white and Staff Parking, and a grid of matching car pictures"></a>
+    </article>
+
+    <article class="feature feature--flip rv">
+      <div class="feature__text">
+        <h3>Describe what it looks like</h3>
+        <p>When words aren't filters, an image-text model (CLIP, running locally) ranks every detection by how well it matches. For <code>people playing basketball</code>, all of the top results show exactly that.</p>
+        <ul>
+          <li>Results are ranked, never hidden, with a match bar on each</li>
+          <li>Ranking a thousand detections takes a fraction of a second on a CPU</li>
+        </ul>
+      </div>
+      <a class="shot" href="screenshots/visual.jpg"><img src="screenshots/visual-crop.jpg" width="1300" height="650" loading="lazy" alt="Visual search results for people playing basketball: pictures of people dribbling and shooting in a gym"></a>
+    </article>
+
+    <article class="feature rv">
+      <div class="feature__text">
+        <h3>A 24-hour timeline, and the clip in a second</h3>
+        <p>Click any result to play that moment. The timeline shows what was recorded and when people, vehicles and motion appeared. Drag across it, or press I and O, and download the clip.</p>
+        <ul>
+          <li>Zoom to 24, 6 or 1 hour; jump to the previous or next detection</li>
+          <li>Clips are cut without re-encoding: original quality, under a second for five minutes</li>
+          <li>Links that open a camera at an exact moment</li>
+        </ul>
+        <div class="chips"><span class="chip chip--p">people</span><span class="chip chip--v">vehicles</span><span class="chip chip--m">motion</span><span class="chip chip--a">clip range</span></div>
+      </div>
+      <a class="shot" href="screenshots/playback.jpg"><img src="screenshots/playback-crop.jpg" width="1300" height="950" loading="lazy" alt="Playback: a gym camera playing, a 24-hour timeline with lanes for recordings, people, vehicles and motion, a selected clip range and a ready clip"></a>
+    </article>
+  </div>
+</section>
+
+<!-- ======================= demo ======================= -->
+<section class="sec sec--tint" id="demo" aria-labelledby="h-demo">
+  <div class="wrap">
+    <div class="sec__head">
+      <span class="kicker">Demo</span>
+      <h2 id="h-demo">See the full tour</h2>
+      <p>Live wall, search, visual search, playback and clip export, recorded from the running app in 1 minute 41 seconds.</p>
+    </div>
+    <div class="demo rv">
+      <video controls playsinline preload="none" poster="assets/video/poster.jpg">
+        <source src="assets/video/demo-full.mp4" type="video/mp4">
+        Your browser can't play this video. <a href="assets/video/demo-full.mp4">Download it</a>.
+      </video>
+    </div>
+    <p class="caption">Contains video from the MEVA dataset by Kitware Inc. and IARPA (<a href="https://mevadata.org">mevadata.org</a>), CC BY 4.0. Clips cut and re-encoded.</p>
+  </div>
+</section>
+
+<!-- ======================= how it works ======================= -->
+<section class="sec" id="how" aria-labelledby="h-how">
+  <div class="wrap">
+    <div class="sec__head">
+      <span class="kicker">How it works</span>
+      <h2 id="h-how">One desktop app, a browser dashboard, nothing in the cloud</h2>
+      <p>A C++ application records, analyses and indexes the footage. The dashboard is served from the same PC and works in any browser on it.</p>
+    </div>
+    <div class="flow">
+      <div class="step rv"><small>1 · RECORD</small><b>Cameras to disk</b><p>RTSP streams copied to 5-minute MP4 files, one FFmpeg per camera.</p><code>FFmpeg</code></div>
+      <div class="step rv"><small>2 · DETECT</small><b>People and vehicles</b><p>1 frame a second through YOLOv8, tracked so each object is one event.</p><code>ONNX Runtime</code></div>
+      <div class="step rv"><small>3 · DESCRIBE</small><b>Colour, look, motion</b><p>Dominant colour, a CLIP image fingerprint and a motion level per second.</p><code>CLIP</code></div>
+      <div class="step rv"><small>4 · INDEX</small><b>Searchable history</b><p>Events, recordings and fingerprints in a local database.</p><code>SQLite</code></div>
+      <div class="step rv"><small>5 · FIND</small><b>Search and play</b><p>Plain-English and visual search, WebRTC live view, HLS playback, clip cutting.</p><code>Drogon · go2rtc</code></div>
+    </div>
+    <div class="notes">
+      <div class="note rv"><b>Private by design</b><p>Footage, detections and search all stay on the PC. The dashboard listens only on this computer.</p></div>
+      <div class="note rv"><b>Modest hardware</b><p>Developed and tested on a 4-core Intel i7 with 8 GB of RAM and no graphics card.</p></div>
+      <div class="note rv"><b>Plain files</b><p>Recordings are ordinary MP4 files per camera and day that any player can open.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= stack ======================= -->
+<section class="sec sec--tint" id="stack" aria-labelledby="h-stack">
+  <div class="wrap">
+    <div class="sec__head">
+      <span class="kicker">Built with</span>
+      <h2 id="h-stack">The technology inside</h2>
+    </div>
+    <div class="stack">
+      <div class="tech rv"><b>C++17 · Qt 6</b><span>Desktop app, process and thread management</span></div>
+      <div class="tech rv"><b>Drogon</b><span>REST API and web server, in C++</span></div>
+      <div class="tech rv"><b>ONNX Runtime · YOLOv8</b><span>Person and vehicle detection on the CPU</span></div>
+      <div class="tech rv"><b>CLIP</b><span>Visual search, with a tokenizer written in C++</span></div>
+      <div class="tech rv"><b>llama.cpp · Qwen3</b><span>Optional local language model for search</span></div>
+      <div class="tech rv"><b>FFmpeg</b><span>Recording, HLS playback, clip cutting</span></div>
+      <div class="tech rv"><b>go2rtc · WebRTC</b><span>Low-latency live view in the browser</span></div>
+      <div class="tech rv"><b>SQLite</b><span>Events, recordings and image fingerprints</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= results ======================= -->
+<section class="sec" id="results" aria-labelledby="h-results">
+  <div class="wrap">
+    <div class="sec__head">
+      <span class="kicker">Measured</span>
+      <h2 id="h-results">Numbers from testing</h2>
+      <p>Measured on the development PC: 4 cores, 8 GB of RAM, no graphics card.</p>
+    </div>
+    <div class="stats">
+      <div class="stat rv"><b>12 of 12</b><span>Top visual matches correct</span><p>for "people with a backpack" in testing, against about 1 in 12 without visual ranking.</p></div>
+      <div class="stat rv"><b>&lt; 1 s</b><span>To cut a 5-minute clip</span><p>Cut from the recordings without re-encoding, at the exact length asked for.</p></div>
+      <div class="stat rv"><b>70–210 ms</b><span>To rank 1,300 detections</span><p>Visual search re-ordering, on the CPU.</p></div>
+      <div class="stat rv"><b>1 per object</b><span>Not one per frame</span><p>Tracking cut repeated events sharply: a parked car used to log one a second.</p></div>
+      <div class="stat rv"><b>0</b><span>Searches made worse by the AI</span><p>The language model only explains words the rules don't know, checked four ways.</p></div>
+      <div class="stat rv"><b>145</b><span>Automated tests for search</span><p>Plus tests for the image-text pipeline against CLIP's reference output.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= status ======================= -->
+<section class="sec sec--tint" id="status" aria-labelledby="h-status">
+  <div class="wrap">
+    <div class="sec__head">
+      <span class="kicker">Status</span>
+      <h2 id="h-status">Where it is today</h2>
+      <p>A working product running on Windows, shown here in its demo mode with simulated cameras.</p>
+    </div>
+    <div class="cols">
+      <div class="card rv"><h3>Working now</h3><ul><li>Recording, live view, detection, motion</li><li>Plain-English, AI-assisted and visual search</li><li>Timeline playback and clip export</li><li>Settings, recording folder, demo mode</li></ul></div>
+      <div class="card rv"><h3>Next</h3><ul><li>User accounts and access control</li><li>Automatic camera reconnects</li><li>Deleting the oldest footage when the disk fills</li><li>Alerts, such as people after hours</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= contact ======================= -->
+<section class="sec contact" id="contact" aria-labelledby="h-contact">
+  <div class="wrap">
+    <h2 id="h-contact">Want a demo, or something like this built?</h2>
+    <p>I build desktop and video software in C++ and Qt, with computer vision and local AI. Happy to walk you through the code and the design.</p>
+    <div class="hero__cta">
+      <a class="btn btn--solid" data-mail href="#contact">Email me</a>
+      <a class="btn btn--line" href="https://haris-pp.github.io/">More about me</a>
+      <a class="btn btn--line" href="https://haris-pp.github.io/recoracam-website/">See RecoraCam NVR</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>© 2026 Haris P P. Demo footage: MEVA dataset by Kitware Inc. and IARPA (<a href="https://mevadata.org">mevadata.org</a>), <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, clips cut and re-encoded. Fonts: Manrope and DM Mono (SIL Open Font License, <a href="assets/fonts/LICENSE-manrope.txt">licence</a>).</p>
+    <p><a href="https://haris-pp.github.io/">haris-pp.github.io</a></p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  // The mail link is built here so the address isn't sitting in the page for scrapers.
+  var mailUser = "harisprp", mailHost = "gmail.com", mailAddr = mailUser + "@" + mailHost;
+  document.querySelectorAll("[data-mail]").forEach(function (a) {
+    a.href = "mailto:" + mailAddr + "?subject=" + encodeURIComponent("AI Video Investigator");
+  });
+
+  // Reveal sections as they scroll into view.
+  var items = document.querySelectorAll(".rv");
+  if (!("IntersectionObserver" in window)) { items.forEach(function (el) { el.classList.add("in"); }); return; }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+  }, { rootMargin: "0px 0px -8% 0px" });
+  items.forEach(function (el) { io.observe(el); });
+})();
+</script>
+</body>
+</html>
