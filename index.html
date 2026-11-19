@@ -4,19 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI Video Investigator: search your camera footage in plain English</title>
-<meta name="description" content="AI Video Investigator records IP cameras, detects people and vehicles, and finds any moment when you type what you're looking for. Live view, a 24-hour timeline and instant clips. Runs entirely on one PC, with no cloud.">
-<meta name="theme-color" content="#0a0a0c">
+<meta name="description" content="AI Video Investigator records IP cameras, detects people and vehicles, raises alerts the moment something happens, groups faces by person and finds any moment when you type what you're looking for. Runs entirely on one PC, with no cloud and no internet needed.">
+<meta name="theme-color" content="#f6f7fb">
 
 <!-- Social previews need an absolute address: this is where the site is published. -->
 <link rel="canonical" href="https://haris-pp.github.io/aivideoinvestigator-website/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://haris-pp.github.io/aivideoinvestigator-website/">
 <meta property="og:title" content="AI Video Investigator: search your camera footage in plain English">
-<meta property="og:description" content="Type “white car at Staff Parking” or “people sitting on a bench” and jump to the moment. Live view, AI detection, a 24-hour timeline and instant clips, all on one PC.">
+<meta property="og:description" content="Type “white car at Staff Parking” or “person 7 yesterday” and jump to the moment. Live alerts, number plates, faces grouped by person, a 24-hour timeline and instant clips, all on one PC.">
 <meta property="og:image" content="https://haris-pp.github.io/aivideoinvestigator-website/assets/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
 
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Crect width='30' height='30' rx='8' fill='%236d8cff'/%3E%3Ccircle cx='15' cy='15' r='6.5' fill='none' stroke='%23fff' stroke-width='2.4'/%3E%3Ccircle cx='15' cy='15' r='2.6' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Crect width='30' height='30' rx='8' fill='%233f5fe0'/%3E%3Ccircle cx='15' cy='15' r='6.5' fill='none' stroke='%23fff' stroke-width='2.4'/%3E%3Ccircle cx='15' cy='15' r='2.6' fill='%23fff'/%3E%3C/svg%3E">
 <link rel="preload" href="assets/fonts/manrope-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
 <script>document.documentElement.classList.add('js')</script>
 
@@ -26,27 +26,18 @@
 @font-face{font-family:"DM Mono";src:url("assets/fonts/dm-mono-latin-400.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
 @font-face{font-family:"DM Mono";src:url("assets/fonts/dm-mono-latin-500.woff2") format("woff2");font-weight:500;font-style:normal;font-display:swap}
 
-/* Same palette as the application's dashboard */
+/* White theme. The screenshots stay dark: that is how the dashboard itself looks. */
 :root{
-  --bg:#0a0a0c; --surface:#131318; --surface-2:#1a1a20; --line:#26262d; --line-2:#33333c;
-  --ink:#ececf1; --muted:#9a9aa6; --dim:#6b6b77;
-  --accent:#6d8cff; --accent-ink:#fff; --accent-soft:rgba(109,140,255,.14);
-  --person:#5ec8ff; --vehicle:#ffb547; --motion:#a78bfa; --ok:#3ddc84; --rec:#ff4d5e;
-  --shadow:0 1px 2px rgba(0,0,0,.4),0 18px 50px rgba(0,0,0,.45);
+  --bg:#f6f7fb; --surface:#fff; --surface-2:#eef1f7; --line:#e2e6ef; --line-2:#d2d7e3;
+  --ink:#0f1220; --muted:#545b6e; --dim:#80879a;
+  --accent:#3f5fe0; --accent-ink:#fff; --accent-soft:rgba(63,95,224,.09);
+  --person:#0277b5; --vehicle:#a8530a; --motion:#6d3ad6; --ok:#16a34a; --rec:#e11d48; --warn:#b45309;
+  --shadow:0 1px 2px rgba(15,18,32,.05),0 12px 36px rgba(15,18,32,.08);
+  --shadow-shot:0 2px 4px rgba(15,18,32,.08),0 22px 54px rgba(15,18,32,.16);
   --font:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"DM Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
   --gutter:clamp(16px,4vw,32px); --max:1180px;
-  color-scheme:dark;
-}
-@media (prefers-color-scheme:light){
-  :root{
-    --bg:#f4f5f8; --surface:#fff; --surface-2:#f7f8fb; --line:#e3e6ee; --line-2:#d4d8e2;
-    --ink:#11131a; --muted:#5a6072; --dim:#8a90a0;
-    --accent:#3f5fe0; --accent-soft:rgba(63,95,224,.1);
-    --person:#0284c7; --vehicle:#b45309; --motion:#7c3aed;
-    --shadow:0 1px 2px rgba(17,19,26,.05),0 14px 40px rgba(17,19,26,.08);
-    color-scheme:light;
-  }
+  color-scheme:light;
 }
 
 *,*::before,*::after{box-sizing:border-box}
@@ -60,42 +51,44 @@ p{margin:0}
 .skip{position:absolute;left:-9999px}.skip:focus{left:16px;top:16px;z-index:99;background:var(--surface);padding:8px 14px;border-radius:8px}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
 code,kbd{font-family:var(--mono);font-size:.88em}
-code,kbd,.q,.eyebrow,.chip,.kicker,.step small,.step code,.screen__bar span{font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0}
-.feature p code{color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1px 6px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+code,kbd,.q,.eyebrow,.chip,.kicker,.step small,.step code,.screen__bar span,.tag{font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0}
+.feature p code,.mini p code{color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1px 6px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
 
 /* top bar */
 .top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:20px;height:64px;max-width:none;
-  background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid var(--line)}
+  background:color-mix(in srgb,var(--bg) 84%,transparent);backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid var(--line)}
 .top>*{flex:none}
 .brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:700;letter-spacing:-.01em}
 .top__links{display:flex;gap:22px;margin-left:auto}
 .top__links a{color:var(--muted);text-decoration:none;font-size:.95rem;font-weight:500}
 .top__links a:hover{color:var(--ink)}
-.btn{display:inline-flex;align-items:center;gap:8px;border-radius:10px;padding:12px 20px;font-weight:600;font-size:1rem;text-decoration:none;border:1px solid transparent;transition:background .15s,border-color .15s,transform .15s;cursor:pointer}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:10px;padding:12px 20px;font-weight:600;font-size:1rem;text-decoration:none;border:1px solid transparent;transition:background .15s,border-color .15s,transform .15s,box-shadow .15s;cursor:pointer}
 .btn:active{transform:translateY(1px)}
-.btn--solid{background:var(--accent);color:var(--accent-ink)}
-.btn--solid:hover{background:color-mix(in srgb,var(--accent) 88%,#fff)}
+.btn--solid{background:var(--accent);color:var(--accent-ink);box-shadow:0 1px 2px rgba(63,95,224,.3),0 6px 18px rgba(63,95,224,.22)}
+.btn--solid:hover{background:color-mix(in srgb,var(--accent) 88%,#000)}
 .btn--line{border-color:var(--line-2);color:var(--ink);background:var(--surface)}
 .btn--line:hover{border-color:var(--dim)}
 .btn--small{padding:8px 14px;font-size:.92rem}
 
 /* hero */
-.hero{padding:clamp(48px,8vw,96px) var(--gutter) 40px;text-align:center}
+.hero{padding:clamp(48px,8vw,96px) var(--gutter) 40px;text-align:center;
+  background:radial-gradient(1100px 460px at 50% -80px,var(--accent-soft),transparent 70%)}
 .eyebrow{display:inline-flex;align-items:center;gap:8px;font:500 .82rem/1 var(--mono);color:var(--muted);border:1px solid var(--line-2);border-radius:30px;padding:7px 14px;background:var(--surface)}
-.eyebrow i{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
+.eyebrow i{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(22,163,74,.15)}
 .hero h1{font-size:clamp(2.4rem,6vw,4.4rem);font-weight:800;margin:22px auto 0;max-width:15ch}
 .hero h1 em{font-style:normal;color:var(--accent)}
-.hero__lead{max-width:62ch;margin:20px auto 0;color:var(--muted);font-size:clamp(1.05rem,1.6vw,1.22rem)}
+.hero__lead{max-width:64ch;margin:20px auto 0;color:var(--muted);font-size:clamp(1.05rem,1.6vw,1.22rem)}
 .hero__cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:30px}
 .hero__note{margin-top:16px;font-size:.9rem;color:var(--dim)}
-.queries{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:34px auto 0;max-width:920px}
-.q{display:inline-flex;align-items:center;gap:8px;font:500 .9rem/1.2 var(--mono);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 14px}
+.queries{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:34px auto 0;max-width:960px}
+.q{display:inline-flex;align-items:center;gap:8px;font:500 .9rem/1.2 var(--mono);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 14px;box-shadow:0 1px 2px rgba(15,18,32,.04)}
 .q svg{flex:none;color:var(--accent)}
 
-.screen{margin:44px auto 0;max-width:1180px;border-radius:14px;overflow:hidden;border:1px solid var(--line-2);background:#000;box-shadow:var(--shadow);position:relative}
+.screen{margin:44px auto 0;max-width:1180px;border-radius:14px;overflow:hidden;border:1px solid var(--line-2);background:#000;box-shadow:var(--shadow-shot);position:relative}
 .screen video{width:100%;aspect-ratio:16/9;object-fit:cover}
-.screen__bar{display:flex;align-items:center;gap:6px;padding:9px 12px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+.screen__bar{display:flex;align-items:center;gap:6px;padding:9px 12px;background:#f0f2f7;border-bottom:1px solid var(--line)}
 .screen__bar i{width:10px;height:10px;border-radius:50%;background:var(--line-2)}
+.screen__bar i:nth-child(1){background:#ff5f57}.screen__bar i:nth-child(2){background:#febc2e}.screen__bar i:nth-child(3){background:#28c840}
 .screen__bar span{margin-left:10px;font:500 .78rem var(--mono);color:var(--dim)}
 .caption{margin-top:12px;font-size:.84rem;color:var(--dim);text-align:center}
 
@@ -108,59 +101,72 @@ code,kbd,.q,.eyebrow,.chip,.kicker,.step small,.step code,.screen__bar span{font
 .sec__head p{margin-top:14px;color:var(--muted);font-size:1.1rem}
 
 /* pillars */
-.pillars{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:56px;text-align:left}
-.pillar{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
-.pillar img{aspect-ratio:16/10;object-fit:cover;object-position:top left;border-bottom:1px solid var(--line)}
+.pillars{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:56px;text-align:left}
+.pillar{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.pillar img{aspect-ratio:16/9;object-fit:cover;object-position:top left;border-bottom:1px solid var(--line);background:#0a0a0c}
 .pillar div{padding:16px 18px 20px}
 .pillar b{display:block;font-size:1.05rem}
 .pillar p{color:var(--muted);font-size:.94rem;margin-top:6px}
+.tag{display:inline-block;margin-left:6px;vertical-align:2px;font:500 .68rem/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);border-radius:20px;padding:4px 7px}
 
 /* feature rows */
-.feature{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(24px,5vw,64px);align-items:center;margin-top:72px}
+.feature{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(24px,5vw,64px);align-items:center;margin-top:88px}
 .feature:first-of-type{margin-top:0}
+.feature--flip{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}
 .feature--flip .feature__text{order:2}
 .feature h3{font-size:clamp(1.4rem,2.4vw,1.8rem);font-weight:800}
 .feature p{color:var(--muted);margin-top:12px}
 .feature ul{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:10px}
 .feature li{position:relative;padding-left:26px;font-size:.98rem}
 .feature li::before{content:"";position:absolute;left:2px;top:.55em;width:12px;height:7px;border-left:2px solid var(--accent);border-bottom:2px solid var(--accent);transform:rotate(-45deg)}
-.shot{display:block;border-radius:12px;overflow:hidden;border:1px solid var(--line-2);box-shadow:var(--shadow);background:#000}
-.shot:hover{border-color:var(--dim)}
+.shot{display:block;border-radius:12px;overflow:hidden;border:1px solid var(--line-2);box-shadow:var(--shadow-shot);background:#0a0a0c;transition:transform .2s,box-shadow .2s}
+.shot:hover{transform:translateY(-2px)}
+.shot--narrow{max-width:620px;margin:0 auto;width:100%}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
 .chip{font:500 .8rem var(--mono);border-radius:20px;padding:4px 10px;border:1px solid var(--line-2);background:var(--surface)}
-.chip--p{color:var(--person)}.chip--v{color:var(--vehicle)}.chip--m{color:var(--motion)}.chip--a{color:var(--accent)}
+.chip--p{color:var(--person)}.chip--v{color:var(--vehicle)}.chip--m{color:var(--motion)}.chip--a{color:var(--accent)}.chip--r{color:var(--rec)}
+.privacy{margin-top:16px;display:flex;gap:10px;align-items:flex-start;font-size:.92rem;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.privacy svg{flex:none;color:var(--accent);margin-top:2px}
+
+/* "also built in" cards */
+.minis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:88px}
+.mini{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:var(--shadow)}
+.mini__icon{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
+.mini h3{font-size:1.15rem;font-weight:800;margin-top:14px}
+.mini p{color:var(--muted);font-size:.95rem;margin-top:8px}
+.mini .plate{display:inline-block;margin-top:12px;font:500 .95rem var(--mono);letter-spacing:.06em;border:2px solid var(--ink);border-radius:6px;padding:2px 10px;background:#fff}
 
 /* how it works */
 .flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;align-items:stretch}
-.step{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;position:relative}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;position:relative;box-shadow:var(--shadow)}
 .step:not(:last-child)::after{content:"";position:absolute;right:-12px;top:50%;width:12px;height:2px;background:var(--line-2)}
 .step small{font:500 .74rem var(--mono);color:var(--accent);letter-spacing:.05em}
 .step b{display:block;margin-top:6px;font-size:1.02rem}
 .step p{color:var(--muted);font-size:.9rem;margin-top:6px}
 .step code{display:inline-block;margin-top:10px;color:var(--dim)}
-.notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:28px}
+.notes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:28px}
 .note{border-left:2px solid var(--accent);padding:2px 0 2px 16px}
 .note b{display:block}
 .note p{color:var(--muted);font-size:.94rem;margin-top:4px}
 
 /* stack */
-.stack{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.stack{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
 .tech{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
 .tech b{display:block;font-size:1rem}
 .tech span{display:block;color:var(--muted);font-size:.88rem;margin-top:4px}
 
 /* numbers */
 .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:var(--shadow)}
 .stat b{display:block;font-size:clamp(1.8rem,3.4vw,2.4rem);font-weight:800;letter-spacing:-.02em;color:var(--accent)}
 .stat span{display:block;margin-top:6px;font-weight:600}
 .stat p{color:var(--muted);font-size:.9rem;margin-top:6px}
 
 /* demo + status + contact */
-.demo{border-radius:14px;overflow:hidden;border:1px solid var(--line-2);box-shadow:var(--shadow);background:#000}
+.demo{border-radius:14px;overflow:hidden;border:1px solid var(--line-2);box-shadow:var(--shadow-shot);background:#000}
 .demo video{width:100%;aspect-ratio:16/9}
 .cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px;box-shadow:var(--shadow)}
 .card h3{font-size:1.15rem}
 .card ul{margin:12px 0 0;padding-left:20px;color:var(--muted)}
 .card li{margin-top:6px}
@@ -168,30 +174,32 @@ code,kbd,.q,.eyebrow,.chip,.kicker,.step small,.step code,.screen__bar span{font
 .contact h2{font-size:clamp(1.9rem,3.6vw,2.7rem);font-weight:800}
 .contact p{color:var(--muted);max-width:60ch;margin:14px auto 0}
 .contact .hero__cta{margin-top:26px}
-footer{border-top:1px solid var(--line);padding:32px 0 48px;color:var(--dim);font-size:.86rem}
+footer{border-top:1px solid var(--line);padding:32px 0 48px;color:var(--dim);font-size:.86rem;background:var(--surface)}
 footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between}
 footer a{color:var(--muted)}
-footer p{max-width:70ch}
+footer p{max-width:76ch}
 
 /* reveal on scroll (only when JS runs) */
 .js .rv{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
 .js .rv.in{opacity:1;transform:none}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.js .rv{opacity:1;transform:none;transition:none}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.js .rv{opacity:1;transform:none;transition:none}.shot:hover{transform:none}}
 
 @media (max-width:1000px){
   .pillars{grid-template-columns:repeat(2,minmax(0,1fr))}
   .flow{grid-template-columns:1fr}
   .step:not(:last-child)::after{left:50%;right:auto;top:auto;bottom:-12px;width:2px;height:12px}
   .stack{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .notes,.stats{grid-template-columns:1fr}
+  .notes{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stats,.minis{grid-template-columns:1fr}
 }
 @media (max-width:760px){
   .top__links{display:none}
   .top .btn{margin-left:auto}
-  .feature{grid-template-columns:1fr}
+  .feature{grid-template-columns:1fr;margin-top:64px}
   .feature--flip .feature__text{order:0}
-  .cols{grid-template-columns:1fr}
+  .cols,.notes{grid-template-columns:1fr}
   .pillars{grid-template-columns:1fr}
+  .minis{margin-top:64px}
 }
 @media (max-width:420px){.top .btn{display:none}}
 </style>
@@ -206,9 +214,10 @@ footer p{max-width:70ch}
   </a>
   <nav class="top__links" aria-label="Page sections">
     <a href="#features">Features</a>
+    <a href="#alerts">Alerts</a>
+    <a href="#people">People</a>
     <a href="#demo">Demo</a>
     <a href="#how">How it works</a>
-    <a href="#stack">Built with</a>
     <a href="#contact">Contact</a>
   </nav>
   <a class="btn btn--solid btn--small" href="#demo">Watch the demo</a>
@@ -218,19 +227,21 @@ footer p{max-width:70ch}
 
 <!-- ======================= hero ======================= -->
 <section class="hero" aria-labelledby="h-hero">
-  <span class="eyebrow"><i></i>Runs entirely on one PC · no cloud</span>
+  <span class="eyebrow"><i></i>Runs entirely on one PC · no cloud · works offline</span>
   <h1 id="h-hero">Ask your cameras <em>what happened.</em></h1>
-  <p class="hero__lead">AI Video Investigator records your IP cameras, detects every person and vehicle, and finds any moment when you type what you're looking for. Watch live, scrub a 24-hour timeline and cut the clip in a second.</p>
+  <p class="hero__lead">AI Video Investigator records your IP cameras, detects every person and vehicle, alerts you the moment something happens, and finds any moment when you type what you're looking for. It reads number plates, groups faces by person, and keeps the disk from ever filling up.</p>
   <div class="hero__cta">
-    <a class="btn btn--solid" href="#demo">Watch the 1-minute demo</a>
+    <a class="btn btn--solid" href="#demo">Watch the demo</a>
     <a class="btn btn--line" href="#contact">Get in touch</a>
   </div>
   <p class="hero__note">Built in C++ and Qt 6 by Haris P P. Source available on request.</p>
 
   <div class="queries" aria-label="Example searches">
     <span class="q"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>white car at Staff Parking</span>
-    <span class="q"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>people at the Bus Waiting Room in the last hour</span>
     <span class="q"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>people sitting on a bench</span>
+    <span class="q"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>person with face visible at the entrance</span>
+    <span class="q"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>person 7 yesterday after 6 pm</span>
+    <span class="q"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>plate KA01*</span>
   </div>
 
   <figure class="screen rv" style="margin-left:auto;margin-right:auto">
@@ -243,9 +254,11 @@ footer p{max-width:70ch}
 
   <div class="pillars wrap" style="padding:0" role="list" aria-label="Main features">
     <article class="pillar rv" role="listitem"><img src="screenshots/live.jpg" width="1920" height="1080" loading="lazy" alt=""><div><b>Live camera wall</b><p>1 to 16 cameras over WebRTC. Show or hide any camera; double-click for full size.</p></div></article>
-    <article class="pillar rv" role="listitem"><img src="screenshots/search-crop.jpg" width="1300" height="650" loading="lazy" alt=""><div><b>Search in plain English</b><p>Objects, colours, cameras and times, understood instantly and offline.</p></div></article>
+    <article class="pillar rv" role="listitem"><img src="screenshots/alerts-crop.jpg" width="1610" height="985" loading="lazy" alt=""><div><b>Live alerts<span class="tag">New</span></b><p>Zones and lines on each camera. Pop-up, sound and snapshot within about a second.</p></div></article>
+    <article class="pillar rv" role="listitem"><img src="screenshots/search-crop.jpg" width="1300" height="650" loading="lazy" alt=""><div><b>Search in plain English</b><p>Objects, colours, cameras, times, plates and people, understood instantly and offline.</p></div></article>
+    <article class="pillar rv" role="listitem"><img src="screenshots/people-crop.jpg" width="1300" height="700" loading="lazy" alt=""><div><b>People<span class="tag">New</span></b><p>Faces grouped by person. Every visit of the same person, playable one after another.</p></div></article>
     <article class="pillar rv" role="listitem"><img src="screenshots/visual-crop.jpg" width="1300" height="650" loading="lazy" alt=""><div><b>Visual search</b><p>Describe how it looks. An image-text model ranks every detection.</p></div></article>
-    <article class="pillar rv" role="listitem"><img src="screenshots/playback-crop.jpg" width="1300" height="950" loading="lazy" alt=""><div><b>Timeline and clips</b><p>People, vehicles and motion on 24 hours. Drag to cut a clip.</p></div></article>
+    <article class="pillar rv" role="listitem"><img src="screenshots/playback-crop.jpg" width="1300" height="950" loading="lazy" alt=""><div><b>Timeline and clips</b><p>People, vehicles, motion and alerts on 24 hours. Drag to cut a clip, or keep it.</p></div></article>
   </div>
 </section>
 
@@ -255,7 +268,7 @@ footer p{max-width:70ch}
     <div class="sec__head">
       <span class="kicker">Features</span>
       <h2 id="h-features">From the camera to the exact moment</h2>
-      <p>Hours of footage become a list of people and vehicles you can search, play and export, without sending a single frame to the internet.</p>
+      <p>Hours of footage become a list of people and vehicles you can search, play and export, and the cameras tell you when something needs attention, without sending a single frame to the internet.</p>
     </div>
 
     <article class="feature rv">
@@ -271,29 +284,44 @@ footer p{max-width:70ch}
       <a class="shot" href="screenshots/live.jpg"><img src="screenshots/live.jpg" width="1920" height="1080" loading="lazy" alt="Live view: a four-camera wall of a bus station waiting room, a parking lot, a gym and a school hallway, the camera list, and today's events on the right"></a>
     </article>
 
-    <article class="feature feature--flip rv">
+    <article class="feature feature--flip rv" id="alerts">
       <div class="feature__text">
-        <h3>Every person and vehicle, once</h3>
-        <p>Each recording is analysed with YOLOv8. Objects are tracked from frame to frame, so a parked car is one event, not one per second, and each event keeps its best picture and its colour.</p>
-        <div class="chips"><span class="chip chip--p">person</span><span class="chip chip--v">car · truck · bus</span><span class="chip">colour</span><span class="chip chip--m">motion level per second</span></div>
+        <h3>Zones, lines and alerts the moment it happens</h3>
+        <p>Draw zones and lines on any camera, then add rules in plain words. Live analysis follows every person and vehicle, and when a rule matches you get a pop-up with a snapshot and a sound, usually within a second.</p>
+        <ul>
+          <li>Enters, leaves, crosses a line in one direction, stays longer than a set time, or is there at all</li>
+          <li>Rules for set hours and days: "Person in Lobby, outside 08:00–19:00, Mon–Fri"</li>
+          <li>Each alert keeps an annotated snapshot and appears as a red tick on the playback timeline</li>
+          <li>Objects already inside when analysis starts don't count as entering, and each object alerts once per rule</li>
+        </ul>
+        <div class="chips"><span class="chip chip--p">enters · leaves</span><span class="chip chip--a">crosses A → B</span><span class="chip chip--v">stays over 2 min</span><span class="chip chip--r">after hours</span></div>
       </div>
-      <a class="shot" href="screenshots/focus.jpg"><img src="screenshots/focus.jpg" width="1920" height="1080" loading="lazy" alt="One camera opened full size, with the detections from that camera listed on the right"></a>
+      <a class="shot" href="screenshots/alerts-crop.jpg"><img src="screenshots/alerts-crop.jpg" width="1610" height="985" loading="lazy" alt="Live wall with people and cars boxed and numbered by the live analysis, and an alert pop-up: Person stays in Bleachers over 20 s, with a snapshot and View live and Dismiss buttons"></a>
     </article>
 
     <article class="feature rv">
       <div class="feature__text">
+        <h3>Every person and vehicle, once</h3>
+        <p>Cameras with rules or live analysis are watched as it happens; everything else is searched from the recordings. Objects are tracked from frame to frame, so a parked car is one event, not one per second, and each event keeps its best picture and its colour.</p>
+        <div class="chips"><span class="chip chip--p">person</span><span class="chip chip--v">car · truck · bus</span><span class="chip">colour</span><span class="chip chip--p">face visible</span><span class="chip chip--m">motion level per second</span></div>
+      </div>
+      <a class="shot" href="screenshots/focus.jpg"><img src="screenshots/focus.jpg" width="1920" height="1080" loading="lazy" alt="One camera opened full size, with the detections from that camera listed on the right"></a>
+    </article>
+
+    <article class="feature feature--flip rv">
+      <div class="feature__text">
         <h3>Search the way you'd ask a colleague</h3>
-        <p>Type <code>white car at Staff Parking</code> or <code>people at the Bus Waiting Room in the last hour</code>. The search understands objects, colours, camera names, dates and times, shows what it understood as filters you can remove, and suggests close matches when nothing fits exactly.</p>
+        <p>Type <code>white car at Staff Parking</code> or <code>people at the Bus Waiting Room in the last hour</code>. The search understands objects, colours, camera names, dates and times, number plates and people, shows what it understood as filters you can remove, and suggests close matches when nothing fits exactly.</p>
         <ul>
           <li>Autocomplete for camera names and common phrases</li>
-          <li>Handles typos, "not red", "between 4 and 7", "yesterday afternoon"</li>
+          <li>Handles typos, "not red", "between 4 and 7", "yesterday afternoon", "face visible"</li>
           <li>Optional local language model (llama.cpp) for unusual words, and it can never make a search worse</li>
         </ul>
       </div>
       <a class="shot" href="screenshots/search.jpg"><img src="screenshots/search-crop.jpg" width="1300" height="650" loading="lazy" alt="Search results for white car at Staff Parking: filter chips for car, white and Staff Parking, and a grid of matching car pictures"></a>
     </article>
 
-    <article class="feature feature--flip rv">
+    <article class="feature rv">
       <div class="feature__text">
         <h3>Describe what it looks like</h3>
         <p>When words aren't filters, an image-text model (CLIP, running locally) ranks every detection by how well it matches. For <code>people sitting on a bench</code>, the top results are the person sitting on the gym bleachers.</p>
@@ -305,19 +333,67 @@ footer p{max-width:70ch}
       <a class="shot" href="screenshots/visual.jpg"><img src="screenshots/visual-crop.jpg" width="1300" height="650" loading="lazy" alt="Visual search results for people sitting on a bench: the top pictures all show a man sitting on the gym bleachers"></a>
     </article>
 
+    <article class="feature feature--flip rv" id="people">
+      <div class="feature__text">
+        <h3>Who was here, and every time they came back</h3>
+        <p>On cameras where faces are close enough, the same person's faces are grouped together. The People page shows one card per person; open one to see every visit and play them one after another. Give someone a name, and search for them like anything else.</p>
+        <ul>
+          <li><code>person with face visible at the entrance</code> finds the moments a face can be seen</li>
+          <li><code>Bald man, glasses yesterday</code> or <code>person 7 at the gate</code> finds one person's visits</li>
+          <li>Turn on "Alert when seen" to get a pop-up when that person shows up again</li>
+          <li>Merge two groups, remove a wrong face, or forget a person in one click</li>
+        </ul>
+        <p class="privacy"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3 4 6v6c0 4.4 3.4 8.3 8 9 4.6-.7 8-4.6 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg><span>Off by default and switched on per camera. Faces are only grouped, never matched against outside photos, and are deleted with the footage. Switching a camera off forgets its faces.</span></p>
+      </div>
+      <a class="shot" href="screenshots/people-crop.jpg"><img src="screenshots/people-crop.jpg" width="1300" height="700" loading="lazy" alt="People page: ten face cards such as Person 14 and Bald man, glasses with their number of sightings, and an open panel for Bald man, glasses with Play all, Alert when seen and a list of visits at Hallway Entrance"></a>
+    </article>
+
     <article class="feature rv">
       <div class="feature__text">
         <h3>A 24-hour timeline, and the clip in a second</h3>
-        <p>Click any result to play that moment. The timeline shows what was recorded and when people, vehicles and motion appeared. Drag across it, or press I and O, and download the clip.</p>
+        <p>Click any result to play that moment. The timeline shows what was recorded and when people, vehicles, motion and alerts appeared. Drag across it, or press I and O, and download the clip.</p>
         <ul>
           <li>Zoom to 24, 6 or 1 hour; jump to the previous or next detection</li>
           <li>Clips are cut without re-encoding: original quality, under a second for five minutes</li>
-          <li>Links that open a camera at an exact moment</li>
+          <li>A day opens in one to three seconds, with a progress panel while it prepares</li>
+          <li>"Keep footage" marks a range that is never deleted</li>
         </ul>
-        <div class="chips"><span class="chip chip--p">people</span><span class="chip chip--v">vehicles</span><span class="chip chip--m">motion</span><span class="chip chip--a">clip range</span></div>
+        <div class="chips"><span class="chip chip--p">people</span><span class="chip chip--v">vehicles</span><span class="chip chip--m">motion</span><span class="chip chip--r">alerts</span><span class="chip chip--a">clip range</span></div>
       </div>
       <a class="shot" href="screenshots/playback.jpg"><img src="screenshots/playback-crop.jpg" width="1300" height="950" loading="lazy" alt="Playback: the gym camera playing, a 24-hour timeline with lanes for recordings, people, vehicles and motion, a selected clip range and a ready clip"></a>
     </article>
+
+    <article class="feature feature--flip rv">
+      <div class="feature__text">
+        <h3>Storage that looks after itself</h3>
+        <p>Recordings older than 30 days are deleted automatically, with their detections and alerts. If the drive still gets too full, the oldest recordings go first, across all cameras, so recording never stops for lack of space.</p>
+        <ul>
+          <li>Both limits in Settings, with a status line of what was last deleted and why</li>
+          <li>Footage marked "Keep" in Playback, and recordings still being written, are never deleted</li>
+          <li>Runs every five minutes on a low-priority thread</li>
+        </ul>
+      </div>
+      <a class="shot shot--narrow" href="screenshots/old-footage-crop.jpg"><img src="screenshots/old-footage-crop.jpg" width="712" height="303" loading="lazy" alt="Settings, Old footage: keep recordings for 30 days, always keep 10 percent of the drive free, and the status: 681 recordings, 3 kept, 74.9 GB free"></a>
+    </article>
+
+    <div class="minis" aria-label="Also built in">
+      <article class="mini rv">
+        <div class="mini__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="7" width="20" height="10" rx="2"/><path d="M6 12h.01M10 12h4M18 12h.01"/></svg></div>
+        <h3>Number plates</h3>
+        <p>Plates are read on live cameras and from recordings, kept in a searchable list, and checked against your lists, such as "Staff" or "Banned". Rules can use them: "Vehicle not on Staff enters Gate". On real car-park footage, 5 of 5 plates were read exactly.</p>
+        <span class="plate">KA01AB1234</span>
+      </article>
+      <article class="mini rv">
+        <div class="mini__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 8.8a15 15 0 0 1 20 0"/><path d="M5 12.6a10 10 0 0 1 14 0"/><path d="M8.5 16.4a5 5 0 0 1 7 0"/><path d="M12 20h.01"/><path d="m3 3 18 18"/></svg></div>
+        <h3>Works without internet</h3>
+        <p>Everything the dashboard needs, from the icons to the video player, is served by the app itself. Detection, search, faces and plates all run on the PC, so a site with no internet connection loses nothing.</p>
+      </article>
+      <article class="mini rv">
+        <div class="mini__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg></div>
+        <h3>Fast on a modest PC</h3>
+        <p>Live analysis and recording search share one detector, so watched cameras aren't searched twice. On a 4-core PC without a graphics card, busy cameras are analysed about two frames a second, with results in about 0.2 seconds.</p>
+      </article>
+    </div>
   </div>
 </section>
 
@@ -327,7 +403,7 @@ footer p{max-width:70ch}
     <div class="sec__head">
       <span class="kicker">Demo</span>
       <h2 id="h-demo">See the full tour</h2>
-      <p>Live wall, search, visual search, playback and clip export, recorded from the running app in 1 minute 35 seconds.</p>
+      <p>Live wall, search, visual search, playback and clip export, recorded from the running app in 1 minute 35 seconds. Recorded before alerts, number plates and faces were added: the screenshots above show those.</p>
     </div>
     <div class="demo rv">
       <video controls playsinline preload="none" poster="assets/video/poster.jpg">
@@ -345,17 +421,18 @@ footer p{max-width:70ch}
     <div class="sec__head">
       <span class="kicker">How it works</span>
       <h2 id="h-how">One desktop app, a browser dashboard, nothing in the cloud</h2>
-      <p>A C++ application records, analyses and indexes the footage. The dashboard is served from the same PC and works in any browser on it.</p>
+      <p>A C++ application records, analyses and indexes the footage. The dashboard is served from the same PC and works in any browser on it, even with no internet connection.</p>
     </div>
     <div class="flow">
-      <div class="step rv"><small>1 · RECORD</small><b>Cameras to disk</b><p>RTSP streams copied to 5-minute MP4 files, one FFmpeg per camera.</p><code>FFmpeg</code></div>
-      <div class="step rv"><small>2 · DETECT</small><b>People and vehicles</b><p>1 frame a second through YOLOv8, tracked so each object is one event.</p><code>ONNX Runtime</code></div>
-      <div class="step rv"><small>3 · DESCRIBE</small><b>Colour, look, motion</b><p>Dominant colour, a CLIP image fingerprint and a motion level per second.</p><code>CLIP</code></div>
-      <div class="step rv"><small>4 · INDEX</small><b>Searchable history</b><p>Events, recordings and fingerprints in a local database.</p><code>SQLite</code></div>
-      <div class="step rv"><small>5 · FIND</small><b>Search and play</b><p>Plain-English and visual search, WebRTC live view, HLS playback, clip cutting.</p><code>Drogon · go2rtc</code></div>
+      <div class="step rv"><small>1 · RECORD</small><b>Cameras to disk</b><p>RTSP streams copied to 5-minute MP4 files, one FFmpeg per camera. Old footage recycled.</p><code>FFmpeg</code></div>
+      <div class="step rv"><small>2 · DETECT</small><b>People and vehicles</b><p>Live on watched cameras, from the recordings on the rest. Tracked, so each object is one event.</p><code>ONNX Runtime</code></div>
+      <div class="step rv"><small>3 · DESCRIBE</small><b>Colour, look, face, plate</b><p>Dominant colour, a CLIP image fingerprint, faces and number plates, and motion per second.</p><code>CLIP · YuNet · SFace</code></div>
+      <div class="step rv"><small>4 · INDEX</small><b>Searchable history</b><p>Events, alerts, plates, people and recordings in a local database.</p><code>SQLite</code></div>
+      <div class="step rv"><small>5 · FIND &amp; ALERT</small><b>Search, play, get told</b><p>Plain-English, visual and person search; zone rules push alerts to every open dashboard.</p><code>Drogon · go2rtc</code></div>
     </div>
     <div class="notes">
       <div class="note rv"><b>Private by design</b><p>Footage, detections and search all stay on the PC. The dashboard listens only on this computer.</p></div>
+      <div class="note rv"><b>Faces are opt-in</b><p>Grouping is off until switched on per camera, and face data goes with the footage.</p></div>
       <div class="note rv"><b>Modest hardware</b><p>Developed and tested on a 4-core Intel i7 with 8 GB of RAM and no graphics card.</p></div>
       <div class="note rv"><b>Plain files</b><p>Recordings are ordinary MP4 files per camera and day that any player can open.</p></div>
     </div>
@@ -371,13 +448,15 @@ footer p{max-width:70ch}
     </div>
     <div class="stack">
       <div class="tech rv"><b>C++17 · Qt 6</b><span>Desktop app, process and thread management</span></div>
-      <div class="tech rv"><b>Drogon</b><span>REST API and web server, in C++</span></div>
+      <div class="tech rv"><b>Drogon</b><span>REST API, WebSocket alerts and web server, in C++</span></div>
       <div class="tech rv"><b>ONNX Runtime · YOLOv8</b><span>Person and vehicle detection on the CPU</span></div>
+      <div class="tech rv"><b>ByteTrack-style tracker</b><span>One event per object; zone and line rules</span></div>
       <div class="tech rv"><b>CLIP</b><span>Visual search, with a tokenizer written in C++</span></div>
+      <div class="tech rv"><b>YuNet · SFace</b><span>Finding faces and grouping them by person</span></div>
+      <div class="tech rv"><b>Plate finder + OCR</b><span>Number plates on live cameras and recordings</span></div>
       <div class="tech rv"><b>llama.cpp · Qwen3</b><span>Optional local language model for search</span></div>
-      <div class="tech rv"><b>FFmpeg</b><span>Recording, HLS playback, clip cutting</span></div>
-      <div class="tech rv"><b>go2rtc · WebRTC</b><span>Low-latency live view in the browser</span></div>
-      <div class="tech rv"><b>SQLite</b><span>Events, recordings and image fingerprints</span></div>
+      <div class="tech rv"><b>FFmpeg · go2rtc</b><span>Recording, WebRTC live view, HLS playback, clips</span></div>
+      <div class="tech rv"><b>SQLite</b><span>Events, alerts, plates, people and fingerprints</span></div>
     </div>
   </div>
 </section>
@@ -391,12 +470,15 @@ footer p{max-width:70ch}
       <p>Measured on the development PC: 4 cores, 8 GB of RAM, no graphics card.</p>
     </div>
     <div class="stats">
+      <div class="stat rv"><b>~0.2 s</b><span>From frame to result, live</span><p>About two analysed frames a second on busy cameras, over three times more than before the shared detector.</p></div>
+      <div class="stat rv"><b>~1 s</b><span>From event to alert</span><p>Rules fire on the live tracks; the alert reaches every open dashboard about a second later.</p></div>
+      <div class="stat rv"><b>5 of 5</b><span>Number plates read exactly</span><p>On real car-park footage, read both live and later from the recordings.</p></div>
+      <div class="stat rv"><b>7 people, 7 groups</b><span>Faces grouped by person</span><p>366 faces from an entrance camera, each group one person, checked picture by picture.</p></div>
       <div class="stat rv"><b>12 of 12</b><span>Top visual matches correct</span><p>for "people with a backpack" in testing, against about 1 in 12 without visual ranking.</p></div>
       <div class="stat rv"><b>&lt; 1 s</b><span>To cut a 5-minute clip</span><p>Cut from the recordings without re-encoding, at the exact length asked for.</p></div>
-      <div class="stat rv"><b>70–210 ms</b><span>To rank 1,300 detections</span><p>Visual search re-ordering, on the CPU.</p></div>
-      <div class="stat rv"><b>1 per object</b><span>Not one per frame</span><p>Tracking cut repeated events sharply: a parked car used to log one a second.</p></div>
+      <div class="stat rv"><b>0.9–2.6 s</b><span>To open a day in Playback</span><p>Down from 6–11 s: the recording is prepared while the timeline loads.</p></div>
       <div class="stat rv"><b>0</b><span>Searches made worse by the AI</span><p>The language model only explains words the rules don't know, checked four ways.</p></div>
-      <div class="stat rv"><b>145</b><span>Automated tests for search</span><p>Plus tests for the image-text pipeline against CLIP's reference output.</p></div>
+      <div class="stat rv"><b>261</b><span>Automated tests</span><p>For search, alert rules, zones, number plates, storage and face grouping.</p></div>
     </div>
   </div>
 </section>
@@ -410,8 +492,8 @@ footer p{max-width:70ch}
       <p>A working product running on Windows, shown here in its demo mode with simulated cameras.</p>
     </div>
     <div class="cols">
-      <div class="card rv"><h3>Working now</h3><ul><li>Recording, live view, detection, motion</li><li>Plain-English, AI-assisted and visual search</li><li>Timeline playback and clip export</li><li>Settings, recording folder, demo mode</li></ul></div>
-      <div class="card rv"><h3>Next</h3><ul><li>User accounts and access control</li><li>Automatic camera reconnects</li><li>Deleting the oldest footage when the disk fills</li><li>Alerts, such as people after hours</li></ul></div>
+      <div class="card rv"><h3>Working now</h3><ul><li>Recording, live view, detection, motion</li><li>Zones, lines, alert rules and live alerts</li><li>Number plates, plate lists and plate rules</li><li>Face search, the People page and person alerts</li><li>Plain-English, AI-assisted, visual and person search</li><li>Timeline playback, clips and keeping footage</li><li>Automatic deleting of old footage; works offline</li></ul></div>
+      <div class="card rv"><h3>Next</h3><ul><li>User accounts and access control</li><li>Alerts sent beyond the dashboard (webhooks, email)</li><li>Counting rules, such as more than 10 people in a zone</li><li>Automatic camera reconnects</li></ul></div>
     </div>
   </div>
 </section>
@@ -433,7 +515,7 @@ footer p{max-width:70ch}
 
 <footer>
   <div class="wrap">
-    <p>© 2026 Haris P P. Demo footage: MEVA dataset by Kitware Inc. and IARPA (<a href="https://mevadata.org">mevadata.org</a>), <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, clips cut and re-encoded. Fonts: Manrope and DM Mono (SIL Open Font License, <a href="assets/fonts/LICENSE-manrope.txt">licence</a>).</p>
+    <p>© 2026 Haris P P. Demo footage: MEVA dataset by Kitware Inc. and IARPA (<a href="https://mevadata.org">mevadata.org</a>), and Intel IoT DevKit sample-videos (<a href="https://github.com/intel-iot-devkit/sample-videos">github.com/intel-iot-devkit/sample-videos</a>), both <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, clips cut and re-encoded. Fonts: Manrope and DM Mono (SIL Open Font License, <a href="assets/fonts/LICENSE-manrope.txt">licence</a>).</p>
     <p><a href="https://haris-pp.github.io/">haris-pp.github.io</a></p>
   </div>
 </footer>
